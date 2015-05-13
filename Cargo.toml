@@ -1,0 +1,4 @@
+[package]
+name = "sparseset"
+version = "0.1.0"
+authors = ["François-Xavier Bourlet <bombela@gmail.com>"]
