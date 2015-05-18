@@ -2,3 +2,7 @@
 name = "sparseset"
 version = "0.1.0"
 authors = ["François-Xavier Bourlet <bombela@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/bombela/sparseset"
+description = "A Sparse Set"
+keywords = ["sparse", "set", "collection"]
