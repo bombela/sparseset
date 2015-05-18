@@ -1,4 +1,7 @@
-# sparseset
+#  sparseset
+
+[![Build Status](https://travis-ci.org/bombela/sparseset.svg?branch=master)](https://travis-ci.org/bombela/sparseset)
+
 A Sparse Set implemention in rust.
 
 A sparse set is a specialized data structure for representing a set of integers.
