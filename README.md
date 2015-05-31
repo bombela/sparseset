@@ -1,4 +1,4 @@
-#  sparseset
+#  sparseset - [documentation reference](http://bombela.github.io/sparseset/sparseset/struct.SparseSet.html)
 
 [![Build Status](https://travis-ci.org/bombela/sparseset.svg?branch=master)](https://travis-ci.org/bombela/sparseset)
 
