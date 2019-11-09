@@ -1,6 +1,8 @@
-#  sparseset - [documentation reference](http://bombela.github.io/sparseset/sparseset/struct.SparseSet.html)
+#  sparseset
 
 [![Build Status](https://travis-ci.org/bombela/sparseset.svg?branch=master)](https://travis-ci.org/bombela/sparseset)
+[![Documentation](https://docs.rs/sparseset/badge.svg)](https://docs.rs/sparseset)
+
 
 A Sparse Set implemention in rust.
 
