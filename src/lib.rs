@@ -1,7 +1,7 @@
 //! A sparse set.
 
-use std::slice;
 use std::ops::{Deref, DerefMut};
+use std::slice;
 
 /// An implementation of a sparse set.
 ///
@@ -10,7 +10,7 @@ use std::ops::{Deref, DerefMut};
 /// values is very large but used very sparingly and the set is iterated often or cleared often.
 ///
 /// In this implement the SparseSet can hold an arbitrary value for every integer (key) in the set.
-/// 
+///
 /// # Example
 ///
 /// ```
@@ -19,7 +19,7 @@ use std::ops::{Deref, DerefMut};
 /// set.insert(42, 3);
 /// set.insert(77, 5);
 /// set.insert(23, 8);
-/// 
+///
 /// assert_eq!(*set.get(42).unwrap(), 3);
 ///
 /// set.remove(42);
@@ -31,7 +31,7 @@ use std::ops::{Deref, DerefMut};
 /// ```
 ///
 /// # Performance
-/// 
+///
 /// Note that SparseSet is *incredibly* inefficient in terms of space. The O(1) insertion time
 /// assumes space for the element is already allocated.  Otherwise, a large key may require a
 /// massive reallocation, with no direct relation to the number of elements in the collection.
@@ -62,41 +62,52 @@ pub struct SparseSet<T> {
 pub struct Entry<T> {
     key: usize,
 
-	/// The value stored in the entry. A reference to it is returned by value() and value_mut(), as
-	/// well as get() and get_mut() directly from SparseSet. The field can be used without going
-	/// trough the accessors functions since it is public.
+    /// The value stored in the entry. A reference to it is returned by value() and value_mut(), as
+    /// well as get() and get_mut() directly from SparseSet. The field can be used without going
+    /// trough the accessors functions since it is public.
     pub value: T,
 }
 
 impl<T> Entry<T> {
-	/// Read-only access to the entry's key.
-	pub fn key(&self) -> usize { self.key }
+    /// Read-only access to the entry's key.
+    pub fn key(&self) -> usize {
+        self.key
+    }
 
-	/// Returns the value. Mainly for symmetry with key() since the value is public anyway.
-	pub fn value(&self) -> &T { &self.value }
+    /// Returns the value. Mainly for symmetry with key() since the value is public anyway.
+    pub fn value(&self) -> &T {
+        &self.value
+    }
 
-	/// Returns the value, mutable. Mainly for symmetry with key() since the value is public
-	/// anyway.
-	pub fn value_mut(&mut self) -> &mut T { &mut self.value }
+    /// Returns the value, mutable. Mainly for symmetry with key() since the value is public
+    /// anyway.
+    pub fn value_mut(&mut self) -> &mut T {
+        &mut self.value
+    }
 }
 
 impl<T> SparseSet<T> {
-
-	/// Creates a SparseSet with the given capacity.
+    /// Creates a SparseSet with the given capacity.
     pub fn with_capacity(size: usize) -> Self {
         let mut sparse = Vec::with_capacity(size);
         unsafe { sparse.set_len(size) }
-        SparseSet{
+        SparseSet {
             dense: Vec::with_capacity(size),
             sparse: sparse,
         }
     }
 
-    pub fn len(&self) -> usize { self.dense.len() }
-    pub fn capacity(&self) -> usize { self.sparse.len() }
+    pub fn len(&self) -> usize {
+        self.dense.len()
+    }
+    pub fn capacity(&self) -> usize {
+        self.sparse.len()
+    }
 
-	/// Clears the SparseSet in O(1) for simple T and O(n) if T implements Drop.
-    pub fn clear(&mut self) { self.dense.clear(); }
+    /// Clears the SparseSet in O(1) for simple T and O(n) if T implements Drop.
+    pub fn clear(&mut self) {
+        self.dense.clear();
+    }
 
     fn dense_idx(&self, key: usize) -> Option<usize> {
         let dense_idx = self.sparse[key];
@@ -109,7 +120,7 @@ impl<T> SparseSet<T> {
         None
     }
 
-	/// Returns a reference to the value corresponding to the given key in O(1).
+    /// Returns a reference to the value corresponding to the given key in O(1).
     pub fn get(&self, key: usize) -> Option<&T> {
         if let Some(dense_idx) = self.dense_idx(key) {
             Some(&self.dense[dense_idx].value)
@@ -118,7 +129,7 @@ impl<T> SparseSet<T> {
         }
     }
 
-	/// Returns a mutable reference to the value corresponding to the given key in O(1).
+    /// Returns a mutable reference to the value corresponding to the given key in O(1).
     pub fn get_mut(&mut self, key: usize) -> Option<&mut T> {
         if let Some(dense_idx) = self.dense_idx(key) {
             Some(&mut self.dense[dense_idx].value)
@@ -127,33 +138,39 @@ impl<T> SparseSet<T> {
         }
     }
 
-	/// Test if the given key is contained in the set in O(1).
+    /// Test if the given key is contained in the set in O(1).
     pub fn contains(&self, key: usize) -> bool {
         self.dense_idx(key).is_some()
     }
 
-	/// Insert in the set a value for the given key in O(1).
-	/// 
-	/// * returns true if the key was set.
-	/// * returns false if the key was already set.
-	///
-	/// If the key was already set, the previous value is overridden.
+    /// Insert in the set a value for the given key in O(1).
+    ///
+    /// * returns true if the key was set.
+    /// * returns false if the key was already set.
+    ///
+    /// If the key was already set, the previous value is overridden.
     pub fn insert(&mut self, key: usize, value: T) -> bool {
-        assert!(key < self.capacity(),
+        assert!(
+            key < self.capacity(),
             "key ({}) must be under capacity ({})",
-            key, self.capacity());
+            key,
+            self.capacity()
+        );
         if let Some(stored_value) = self.get_mut(key) {
             *stored_value = value;
             return false;
         }
         let n = self.dense.len();
-        self.dense.push(Entry{ key: key, value: value, });
+        self.dense.push(Entry {
+            key: key,
+            value: value,
+        });
         self.sparse[key] = n;
         true
     }
 
-	/// Removes the given key in O(1).
-	/// Returns the removed value or None if key not found.
+    /// Removes the given key in O(1).
+    /// Returns the removed value or None if key not found.
     pub fn remove(&mut self, key: usize) -> Option<T> {
         if self.contains(key) {
             let dense_idx = self.sparse[key];
@@ -167,7 +184,7 @@ impl<T> SparseSet<T> {
             self.sparse[key] = self.capacity();
             Some(r)
         } else {
-			None 
+            None
         }
     }
 }
@@ -326,7 +343,7 @@ fn iter_mut() {
     for entry in &mut s {
         i += 1;
         total += entry.value;
-		entry.value += 1;
+        entry.value += 1;
     }
     assert_eq!(i, 2);
     assert_eq!(total, 22 + 44);
@@ -387,7 +404,7 @@ fn slice() {
         for entry in the_slice {
             i += 1;
             total += entry.key();
-			entry.value = ();
+            entry.value = ();
         }
         assert_eq!(i, 4);
         assert_eq!(total, 3 + 1 + 2);
