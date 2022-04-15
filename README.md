@@ -16,7 +16,7 @@ In this implementation the SparseSet can hold an arbitrary value for every integ
 
 ```
 [dependencies]
-sparseset = "0.1.0"
+sparseset = "1.0.1"
 ```
 
 # Example
