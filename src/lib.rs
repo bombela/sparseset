@@ -175,7 +175,7 @@ impl<T> SparseSet<T> {
         if self.contains(key) {
             let dense_idx = self.sparse[key];
             let r = self.dense.swap_remove(dense_idx).value;
-            if self.len() > 0 {
+            if dense_idx < self.len() {
                 let swapped_entry = &self.dense[dense_idx];
                 self.sparse[swapped_entry.key] = dense_idx;
             }
@@ -307,6 +307,31 @@ fn remove() {
 
     assert!(s.contains(1) == false);
     assert!(s.contains(3) == false);
+}
+
+#[test]
+fn remove2() {
+    let mut s = SparseSet::with_capacity(20_000);
+
+    for i in 1..=10_000 {
+        s.insert(i, 42);
+    }
+
+    for i in 1..=10_000 {
+        s.remove(i);
+    }
+}
+
+#[test]
+fn remove3() {
+    let mut s = SparseSet::with_capacity(100);
+    s.insert(3, 42);
+    s.insert(2, 42);
+    s.insert(1, 42);
+
+    s.remove(3);
+    s.remove(2);
+    s.remove(1);
 }
 
 #[test]
