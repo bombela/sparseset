@@ -311,16 +311,14 @@ fn remove() {
 
 #[test]
 fn remove2() {
-    let mut s = SparseSet::with_capacity(200_000);
-    let mut keys = Vec::new();
+    let mut s = SparseSet::with_capacity(20_000);
 
     for i in 1..=10_000 {
-        keys.push(i);
         s.insert(i, 42);
     }
 
-    for key in keys {
-        s.remove(key);
+    for i in 1..=10_000 {
+        s.remove(i);
     }
 }
 
