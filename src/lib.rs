@@ -1,7 +1,9 @@
 //! A sparse set.
 
-use std::ops::{Deref, DerefMut};
-use std::slice;
+use core::cmp::{Eq, PartialEq};
+use core::hash::Hash;
+use core::ops::{Deref, DerefMut};
+use core::slice;
 
 /// An implementation of a sparse set.
 ///
@@ -57,6 +59,24 @@ pub struct SparseSet<T> {
     sparse: Vec<usize>,
 }
 
+impl<T> Eq for SparseSet<T> where T: Eq {}
+
+impl<T> PartialEq for SparseSet<T>
+where
+    T: PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.dense == other.dense
+    }
+}
+
+impl<T> Hash for SparseSet<T> where T: Hash {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.dense.hash(state);
+        self.sparse.hash(state);
+    }
+}
+
 /// An entry in the sparse set.
 /// You can retrieve a slice (possibly mutable) of [Entry] from the SparseSet.
 pub struct Entry<T> {
@@ -66,6 +86,24 @@ pub struct Entry<T> {
     /// well as get() and get_mut() directly from SparseSet. The field can be used without going
     /// trough the accessors functions since it is public.
     pub value: T,
+}
+
+impl<T> Eq for Entry<T> where T: Eq {}
+
+impl<T> PartialEq for Entry<T>
+where
+    T: PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.key == other.key && self.value == other.value
+    }
+}
+
+impl<T> Hash for Entry<T> where T: Hash {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.key.hash(state);
+        self.value.hash(state);
+    }
 }
 
 impl<T> Entry<T> {
@@ -89,17 +127,22 @@ impl<T> Entry<T> {
 impl<T> SparseSet<T> {
     /// Creates a SparseSet with the given capacity.
     pub fn with_capacity(size: usize) -> Self {
-        let mut sparse = Vec::with_capacity(size);
+        let mut sparse = vec![0; size];
         unsafe { sparse.set_len(size) }
         SparseSet {
             dense: Vec::with_capacity(size),
-            sparse: sparse,
+            sparse,
         }
     }
 
     pub fn len(&self) -> usize {
         self.dense.len()
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     pub fn capacity(&self) -> usize {
         self.sparse.len()
     }
@@ -162,8 +205,8 @@ impl<T> SparseSet<T> {
         }
         let n = self.dense.len();
         self.dense.push(Entry {
-            key: key,
-            value: value,
+            key,
+            value,
         });
         self.sparse[key] = n;
         true
